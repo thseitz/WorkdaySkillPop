@@ -1,9 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import sys
 
@@ -15,11 +17,19 @@ class WorkdaySkillPopulator:
 
     def setup_driver(self):
         """Connect to existing Chrome instance."""
-        chrome_options = Options()
-        chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-        self.driver = webdriver.Chrome(options=chrome_options)
-        self.wait = WebDriverWait(self.driver, 10)
-        print("Connected to Chrome successfully")
+        try:
+            chrome_options = Options()
+            chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+            
+            # Setup ChromeDriver using webdriver_manager
+            service = Service(ChromeDriverManager().install())
+            self.driver = webdriver.Chrome(service=service, options=chrome_options)
+            self.wait = WebDriverWait(self.driver, 10)
+            print("Connected to Chrome successfully")
+        except Exception as e:
+            print(f"Error connecting to Chrome: {str(e)}")
+            print("Please make sure Chrome is running in debug mode (use the Chrome Debug Mode shortcut)")
+            sys.exit(1)
 
     def load_skills(self):
         """Load skills from the specified file."""
