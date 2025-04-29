@@ -1,0 +1,70 @@
+Engineering Management
+Agile Methodology
+Project Management Engineering
+Agile Management
+Software Development Life Cycle (SDLC)
+SDLC Project Management
+Scrum
+Scrum of Scrums
+SAFe
+Scrum Methodology
+Atlassian JIRA
+Atlassian Trello
+Atlassian Bamboo
+Atlassian Confluence
+Azure Devops
+Microsoft Azure DevOps Pipelines
+Azure Repos
+Microsoft Azure
+Microsoft Azure PaaS
+AWS Devops
+DevOps
+AWS Development
+AWS DynamoDB
+Amazon S3
+AWS Lambda
+Microsoft SQL Server
+SQL Query Development
+SQL Databases
+NoSQL Databases
+NoSQL Architecture
+JavaScript
+AJAX (Programming)
+jQuery
+TypeScript
+Fullstack
+C Sharp (Programming Language)
+C#.NET
+ASP.NET MVC
+C# .NET Programming
+C#
+Web Development
+Visual Studio C#
+Java
+Apache Tomcat
+React.js
+React Native
+AngularJS
+Angular
+Python (Programming Language)
+C++ Programming Language
+Django Web Framework
+Windsurf
+IT Governance
+Enterprise IT Governance
+IT Security Governance
+Governance Development
+SOC1 2
+PCI DSS Compliance
+REST
+XML
+PCI Assessment
+QA Automation
+Automation Strategy
+GUI Automation
+API Automation
+Budgeting
+IT Budgets
+Strategic IT
+Strategic Approach
+
