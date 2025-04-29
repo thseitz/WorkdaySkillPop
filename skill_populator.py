@@ -6,9 +6,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 import time
 import sys
 import os
+import platform
 
 class WorkdaySkillPopulator:
     def __init__(self, skills_file_path):
@@ -28,12 +30,28 @@ class WorkdaySkillPopulator:
             chrome_options = Options()
             chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
             
-            # Setup ChromeDriver using webdriver_manager
+            # Setup ChromeDriver using webdriver_manager with architecture detection
             print("Installing ChromeDriver...")
-            service = Service(ChromeDriverManager().install())
+            try:
+                # First try with default settings
+                service = Service(ChromeDriverManager().install())
+                self.driver = webdriver.Chrome(service=service, options=chrome_options)
+            except Exception as chrome_error:
+                print(f"First attempt failed: {str(chrome_error)}")
+                print("Trying alternative ChromeDriver setup...")
+                
+                # Get system architecture
+                is_64bits = platform.machine().endswith('64')
+                if not is_64bits:
+                    print("32-bit system detected")
+                    # Force 32-bit ChromeDriver
+                    os.environ['PROGRAMFILES'] = os.environ.get('PROGRAMFILES(X86)', 'C:\\Program Files (x86)')
+                
+                # Try again with new settings
+                service = Service(ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install())
+                self.driver = webdriver.Chrome(service=service, options=chrome_options)
             
             print("Connecting to Chrome...")
-            self.driver = webdriver.Chrome(service=service, options=chrome_options)
             self.wait = WebDriverWait(self.driver, 10)
             
             # Verify connection
@@ -55,6 +73,7 @@ class WorkdaySkillPopulator:
             print("2. Check if port 9222 is available")
             print("3. Try closing all Chrome windows and starting again")
             print("4. Make sure you have Chrome installed in the default location")
+            print(f"5. System info: {platform.machine()}, {platform.architecture()}")
             sys.exit(1)
 
     def load_skills(self):
