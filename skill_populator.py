@@ -8,33 +8,66 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import sys
+import os
 
 class WorkdaySkillPopulator:
     def __init__(self, skills_file_path):
+        print("Initializing WorkdaySkillPopulator...")
         self.skills_file_path = skills_file_path
+        if not os.path.exists(skills_file_path):
+            print(f"Error: Skills file not found at {skills_file_path}")
+            print(f"Current directory: {os.getcwd()}")
+            sys.exit(1)
         self.driver = None
         self.setup_driver()
 
     def setup_driver(self):
         """Connect to existing Chrome instance."""
         try:
+            print("Setting up Chrome driver...")
             chrome_options = Options()
             chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
             
             # Setup ChromeDriver using webdriver_manager
+            print("Installing ChromeDriver...")
             service = Service(ChromeDriverManager().install())
+            
+            print("Connecting to Chrome...")
             self.driver = webdriver.Chrome(service=service, options=chrome_options)
             self.wait = WebDriverWait(self.driver, 10)
-            print("Connected to Chrome successfully")
+            
+            # Verify connection
+            try:
+                current_url = self.driver.current_url
+                print(f"Connected to Chrome successfully (current URL: {current_url})")
+            except Exception as e:
+                print("Error accessing Chrome window. Make sure Chrome is running in debug mode.")
+                print(f"Error details: {str(e)}")
+                sys.exit(1)
+                
         except Exception as e:
-            print(f"Error connecting to Chrome: {str(e)}")
-            print("Please make sure Chrome is running in debug mode (use the Chrome Debug Mode shortcut)")
+            print("\nError connecting to Chrome:")
+            print(f"Error details: {str(e)}")
+            print("\nTroubleshooting steps:")
+            print("1. Make sure Chrome is running in debug mode:")
+            print("   - Double-click the 'Chrome Debug Mode' shortcut on your desktop")
+            print("   - Or run Chrome with: --remote-debugging-port=9222")
+            print("2. Check if port 9222 is available")
+            print("3. Try closing all Chrome windows and starting again")
+            print("4. Make sure you have Chrome installed in the default location")
             sys.exit(1)
 
     def load_skills(self):
         """Load skills from the specified file."""
-        with open(self.skills_file_path, 'r') as file:
-            return [line.strip() for line in file if line.strip()]
+        print(f"\nLoading skills from {self.skills_file_path}...")
+        try:
+            with open(self.skills_file_path, 'r') as file:
+                skills = [line.strip() for line in file if line.strip()]
+                print(f"Loaded {len(skills)} skills successfully")
+                return skills
+        except Exception as e:
+            print(f"Error loading skills file: {str(e)}")
+            sys.exit(1)
 
     def wait_for_element_interactable(self, element):
         """Wait for an element to become interactable."""
@@ -43,7 +76,8 @@ class WorkdaySkillPopulator:
             self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
             time.sleep(0.5)
             return True
-        except:
+        except Exception as e:
+            print(f"Error waiting for element to be interactable: {str(e)}")
             return False
 
     def clear_input_field(self, element):
@@ -142,7 +176,11 @@ class WorkdaySkillPopulator:
         """
         
         # Single attempt with longer timeout
-        return self.driver.execute_script(script, skill)
+        try:
+            return self.driver.execute_script(script, skill)
+        except Exception as e:
+            print(f"Error selecting skill option: {str(e)}")
+            return False
 
     def populate_skills(self):
         """Populate skills in the current page."""
@@ -150,9 +188,13 @@ class WorkdaySkillPopulator:
         print(f"Processing {len(skills)} skills...")
 
         # Find the input field once and store it
-        skills_input = self.wait.until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '[data-automation-id="searchBox"]'))
-        )
+        try:
+            skills_input = self.wait.until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '[data-automation-id="searchBox"]'))
+            )
+        except Exception as e:
+            print(f"Error finding skills input field: {str(e)}")
+            sys.exit(1)
 
         for i, skill in enumerate(skills, 1):
             try:
